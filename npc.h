@@ -3,8 +3,6 @@
 
 #include <string>
 #include <memory>
-#include <random>
-#include <mutex>
 #include <shared_mutex>
 
 class NPC {
@@ -32,9 +30,12 @@ public:
     NPC(Type type, const std::string& name, int x, int y);
     virtual ~NPC() = default;
 
+    static std::string getTypeString(Type t) {
+        return typeToString(t);
+    }
+    
     std::string getName() const;
     Type getType() const;
-    std::string getTypeString() const;
     int getX() const;
     int getY() const;
     bool isAlive() const;
@@ -51,11 +52,6 @@ public:
     
     void move(int maxX, int maxY);
     std::pair<int, int> rollDice() const;
-
-    void readLock() const { mutex.lock_shared(); }
-    void readUnlock() const { mutex.unlock_shared(); }
-    void writeLock() { mutex.lock(); }
-    void writeUnlock() { mutex.unlock(); }
 };
 
 using NPCPtr = std::shared_ptr<NPC>;
