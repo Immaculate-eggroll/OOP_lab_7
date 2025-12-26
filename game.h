@@ -6,6 +6,7 @@
 #include <thread>
 #include <atomic>
 #include <mutex>
+#include <shared_mutex>
 #include <condition_variable>
 #include <queue>
 #include "npc.h"
@@ -28,7 +29,7 @@ private:
     std::atomic<bool> running;
     std::atomic<int> timeElapsed;
     
-    std::mutex npcsMutex;
+    mutable std::shared_mutex npcsMutex;  // mutable для const методов
     std::mutex battleQueueMutex;
     std::mutex coutMutex;
     std::condition_variable battleCV;
