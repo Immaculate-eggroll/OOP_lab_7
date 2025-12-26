@@ -2,6 +2,7 @@
 #include <cmath>
 #include <random>
 #include <chrono>
+#include <mutex>
 
 NPC::NPC(Type type, const std::string& name, int x, int y) 
     : type(type), name(name), x(x), y(y), alive(true) {}
@@ -13,10 +14,6 @@ std::string NPC::getName() const {
 
 NPC::Type NPC::getType() const {
     return type;
-}
-
-std::string NPC::getTypeString() const {
-    return typeToString(type);
 }
 
 int NPC::getX() const {
@@ -46,6 +43,8 @@ void NPC::kill() {
 }
 
 int NPC::getMoveDistance() const {
+    // По таблице из задания для варианта 7:
+    // Орк: 20, Рыцарь: 30, Медведь: 5
     switch (type) {
         case Type::ORC: return 20;
         case Type::KNIGHT: return 30;
