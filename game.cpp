@@ -2,7 +2,6 @@
 #include <iostream>
 #include <random>
 #include <chrono>
-#include <iomanip>
 
 Game::Game() : running(false), timeElapsed(0) {
     initializeNPCs();
@@ -23,7 +22,7 @@ void Game::initializeNPCs() {
     
     for (int i = 0; i < INITIAL_NPC_COUNT; ++i) {
         NPC::Type type = static_cast<NPC::Type>(typeDist(gen));
-        std::string name = NPC::typeToString(type) + "_" + std::to_string(i);
+        std::string name = NPC::getTypeString(type) + "_" + std::to_string(i);
         int x = posXDist(gen);
         int y = posYDist(gen);
         
@@ -38,7 +37,15 @@ void Game::start() {
     battleThread = std::thread(&Game::battleWorker, this);
     mainThread = std::thread(&Game::mainWorker, this);
     
-    std::cout << "Game started! Duration: " << GAME_DURATION_SECONDS << " seconds" << std::endl;
+    std::cout << "=== NPC Battle Simulation (Variant 7) ===" << std::endl;
+    std::cout << "Rules:" << std::endl;
+    std::cout << "  - Orcs kill Bears" << std::endl;
+    std::cout << "  - Bears kill Knights" << std::endl;
+    std::cout << "  - Knights kill Orcs" << std::endl;
+    std::cout << "  - Map size: " << MAP_WIDTH << "x" << MAP_HEIGHT << std::endl;
+    std::cout << "  - Initial NPCs: " << INITIAL_NPC_COUNT << std::endl;
+    std::cout << "  - Game duration: " << GAME_DURATION_SECONDS << " seconds" << std::endl;
+    std::cout << "Game started!" << std::endl;
 }
 
 void Game::stop() {
@@ -118,10 +125,10 @@ void Game::mainWorker() {
         std::cout << "\n=== GAME OVER ===" << std::endl;
         std::cout << "Survivors after " << GAME_DURATION_SECONDS << " seconds:" << std::endl;
         
-        std::lock_guard lock2(npcsMutex);
+        std::shared_lock lock2(npcsMutex);
         for (const auto& npc : npcs) {
             if (npc->isAlive()) {
-                std::cout << npc->getTypeString() << " " << npc->getName() 
+                std::cout << NPC::getTypeString(npc->getType()) << " " << npc->getName() 
                           << " at (" << npc->getX() << ", " << npc->getY() << ")" << std::endl;
             }
         }
@@ -134,7 +141,7 @@ void Game::printMap() {
     const int DISPLAY_HEIGHT = 20;
     
     std::lock_guard lock(coutMutex);
-    std::cout << "\033[2J\033[H"; // Clear screen
+    std::cout << "\033[2J\033[H";
     
     std::vector<std::vector<char>> grid(DISPLAY_HEIGHT, std::vector<char>(DISPLAY_WIDTH, '.'));
     
